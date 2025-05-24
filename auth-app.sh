@@ -2,9 +2,10 @@
 
 set -o pipefail
 
-client_id=$1 # Client ID as first argument
-private_key_file=$2 # file path of the private key as second argument
-installation_id=$3   # GitHub App installation ID as third argument
+client_id=$1          # Client ID as first argument
+private_key_file=$2   # file path of the private key as second argument
+installation_id=$3    # GitHub App installation ID as third argument
+repo=$4               # Repository name as fourth argument (optional)
 
 # Validate inputs
 if [[ -z "$client_id" || -z "$private_key_file" || -z "$installation_id" ]]; then
@@ -87,5 +88,16 @@ echo "$post_response"
 # JQ needed to be installed
 owner=$(echo "$get_response" | jq -r '.owner.login')
 access_token=$(echo "$post_response" | jq -r '.token')
+git_url="https://x-access-token:$access_token@github.com/$owner/$repo.git"
 echo "Access token: $access_token"
-echo "https://x-access-token:$access_token@github.com/$owner/REPO.git"
+echo "======================================================================================="
+echo "Run the following command if error is: No such remote 'origin'"
+echo "git remote -v"
+echo "git remote add origin $git_url"
+echo "git push origin main --force (optional)"
+echo "======================================================================================="
+echo "Run the following command if error is: remote origin already exists"
+echo "git remote set-url origin $git_url"
+echo "Option commands for this error:"
+echo "git remote remove origin"
+echo "git remote add origin $git_url"
